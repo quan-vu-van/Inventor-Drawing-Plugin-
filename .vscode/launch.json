@@ -1,0 +1,19 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug Inventor Plugin",
+            "type": "clr",
+            "request": "launch",
+            // Đường dẫn đến file chạy của Inventor 2023
+            "program": "C:\\Program Files\\Autodesk\\Inventor 2023\\Bin\\Inventor.exe",
+            "args": [],
+            "cwd": "C:\\Program Files\\Autodesk\\Inventor 2023\\Bin",
+            // Gọi task Build ở trên TRƯỚC KHI mở Inventor
+            "preLaunchTask": "Build and Deploy to Inventor",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "requireExactSource": false
+        }
+    ]
+}

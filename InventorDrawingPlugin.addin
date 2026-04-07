@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Addin Type="Standard">
+  <ClassId>{9D0B4403-518D-40C6-98AC-CD2FF878B309}</ClassId>
+  <ClientId>{9D0B4403-518D-40C6-98AC-CD2FF878B309}</ClientId>
+  
+  <DisplayName>Inventor Drawing Plugin</DisplayName>
+  <Description>Fast and automated tools for processing Inventor Drawings</Description>
+  <Assembly>InventorDrawingPlugin.dll</Assembly>
+  <LoadOnStartUp>1</LoadOnStartUp>
+  <SoftwareVersionGreaterThan>26</SoftwareVersionGreaterThan>
+</Addin>

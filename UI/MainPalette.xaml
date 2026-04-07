@@ -1,0 +1,40 @@
+<UserControl x:Class="InventorDrawingPlugin.Views.MainPalette"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="300"
+             Background="#F0F0F0">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Button x:Name="BtnSmartReplace" Grid.Row="0" Margin="0,5" Padding="10" 
+                Content="Task 1: Smart Replace Model" 
+                FontWeight="Bold" Background="#0078D7" Foreground="White"
+                Click="BtnSmartReplace_Click"/>
+
+        <Button x:Name="BtnSmartRotate" Grid.Row="1" Margin="0,5" Padding="10" 
+                Content="Task 2: Smart Rotate View (Pending)" 
+                Click="BtnSmartRotate_Click"/>
+
+        <Button x:Name="BtnTask3" Grid.Row="2" Margin="0,5" Padding="10" 
+                Content="Task 3: (Pending)" 
+                Click="BtnTask3_Click"/>
+
+        <Button x:Name="BtnTask4" Grid.Row="3" Margin="0,5" Padding="10" 
+                Content="Task 4: (Pending)" 
+                Click="BtnTask4_Click"/>
+        
+        <TextBox x:Name="TxtLog" Grid.Row="4" Margin="0,10,0,0" 
+                 TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" 
+                 IsReadOnly="True" Background="White" 
+                 Text="Ready..."/>
+    </Grid>
+</UserControl>

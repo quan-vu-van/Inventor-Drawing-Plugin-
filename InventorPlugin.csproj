@@ -1,0 +1,59 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF> 
+    <LangVersion>latest</LangVersion>
+    <Platforms>x64</Platforms>
+    <AssemblyName>InventorDrawingPlugin</AssemblyName>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <InventorPath>C:\Program Files\Autodesk\Inventor 2023\Bin</InventorPath>
+    <VaultPath>C:\Program Files\Autodesk\Vault Client 2023\Explorer</VaultPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Autodesk.Inventor.Interop">
+      <HintPath>$(InventorPath)\Public Assemblies\Autodesk.Inventor.Interop.dll</HintPath>
+      <Private>False</Private>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+
+    <Reference Include="Autodesk.Connectivity.WebServices">
+      <HintPath>$(VaultPath)\Autodesk.Connectivity.WebServices.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Autodesk.DataManagement.Client.Framework.Vault">
+      <HintPath>$(VaultPath)\Autodesk.DataManagement.Client.Framework.Vault.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Autodesk.DataManagement.Client.Framework">
+      <HintPath>$(VaultPath)\Autodesk.DataManagement.Client.Framework.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Connectivity.Application.VaultBase">
+      <HintPath>$(VaultPath)\Connectivity.Application.VaultBase.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="WindowsFormsIntegration" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\icondata16.png" />
+    <EmbeddedResource Include="Resources\icondata32.png" />
+  </ItemGroup>
+
+  <Target Name="CopyAddinFile" AfterTargets="Build">
+    <Copy SourceFiles="$(ProjectDir)InventorDrawingPlugin.addin" 
+          DestinationFolder="$(OutputPath)" 
+          OverwriteReadOnlyFiles="true" />
+  </Target>
+</Project>
