@@ -31,13 +31,16 @@ namespace InventorDrawingPlugin.Views
 
                     if (openFileDialog.ShowDialog() == true)
                     {
-                        LogMessage($"[Task 1] Bắt đầu Smart Replace với file:\n{openFileDialog.FileName}");
-                        
-                        // Khởi tạo và chạy Service
-                        Services.SmartReplaceService replaceService = new Services.SmartReplaceService(_inventorApp);
+                        LogMessage($"[Task 1] Bat dau Smart Replace voi file:\n{openFileDialog.FileName}");
+
+                        // Khoi tao Service voi logger truyen thang vao UI
+                        var replaceService = new Services.SmartReplaceService(_inventorApp, msg => LogMessage(msg));
                         replaceService.ExecuteSmartReplace(dwgDoc, openFileDialog.FileName);
-                        
-                        LogMessage("[Task 1] Smart Replace hoàn tất! ID đã được dọn dẹp.");
+
+                        LogMessage($"[Task 1] Hoan tat!");
+                        LogMessage($"  Dim:      XANH={replaceService.CountGreen} | DO={replaceService.CountRed} | MAT={replaceService.CountLost}");
+                        LogMessage($"  Note:     XANH={replaceService.CountNoteGreen} | MAT={replaceService.CountNoteLost}");
+                        LogMessage($"  HoleNote: XANH={replaceService.CountHoleNoteGreen} | DO={replaceService.CountHoleNoteRed} | MAT={replaceService.CountHoleNoteLost}");
                     }
                 }
                 else
