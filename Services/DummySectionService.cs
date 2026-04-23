@@ -442,39 +442,29 @@ namespace InventorDrawingPlugin.Services
                 return;
             }
 
-            // Mo file library (invisible) va copy sketch contents vao empty definitions
-            // Note: CopyContentsTo khong copy hatch/fill - symbol se mat solid fill.
-            // User co the copy thu cong 1 lan qua Inventor UI de giu day du.
-            DrawingDocument libDoc = null;
+            // Mo file library VISIBLE de user tu copy symbols sang drawing cua minh
+            // Ly do: CopyContentsTo khong copy hatch/fill - user copy UI se giu nguyen ven
             try
             {
-                libDoc = (DrawingDocument)_inventorApp.Documents.Open(libFile, false);
+                _inventorApp.Documents.Open(libFile, true);
 
-                foreach (var name in required)
-                {
-                    try { var _ = _dwgDoc.SketchedSymbolDefinitions[name]; continue; }
-                    catch { }
-
-                    try
-                    {
-                        SketchedSymbolDefinition srcDef = libDoc.SketchedSymbolDefinitions[name];
-                        SketchedSymbolDefinition tgtDef = _dwgDoc.SketchedSymbolDefinitions.Add(name);
-                        object tgtSk = tgtDef.Sketch;
-                        srcDef.Sketch.CopyContentsTo((Sketch)tgtSk);
-                    }
-                    catch (Exception ex)
-                    {
-                        _log($"Import '{name}' failed: {ex.Message}");
-                    }
-                }
+                System.Windows.MessageBox.Show(
+                    "Section symbols are missing from this drawing.\n\n" +
+                    "Symbol Sections.idw has been opened.\n\n" +
+                    "How to import symbols:\n" +
+                    "1. In the opened file's Browser, expand 'Sketched Symbols'\n" +
+                    "2. Right-click each symbol (SECTION_L-R, SECTION_R-L, SECTION_U-D, SECTION_D-U)\n" +
+                    "3. Choose 'Copy'\n" +
+                    "4. Switch back to your drawing\n" +
+                    "5. Right-click 'Sketched Symbols' in your Browser → 'Paste'\n\n" +
+                    "After copying, click 'Create Dummy Section' again.",
+                    "Import Symbols Required",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
             }
             catch (Exception ex)
             {
                 _inventorApp.StatusBarText = $"Cannot open library: {ex.Message}";
-            }
-            finally
-            {
-                try { libDoc?.Close(true); } catch { }
             }
         }
 
