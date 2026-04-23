@@ -20,17 +20,20 @@
                 FontWeight="Bold" Background="#0078D7" Foreground="White"
                 Click="BtnSmartReplace_Click"/>
 
-        <Button x:Name="BtnSmartRotate" Grid.Row="1" Margin="0,5" Padding="10" 
-                Content="Task 2: Smart Rotate View (Pending)" 
+        <Button x:Name="BtnSmartRotate" Grid.Row="1" Margin="0,5" Padding="10"
+                Content="Task 2: Smart Rotate View"
+                FontWeight="Bold" Background="#0078D7" Foreground="White"
                 Click="BtnSmartRotate_Click"/>
 
-        <Button x:Name="BtnTask3" Grid.Row="2" Margin="0,5" Padding="10" 
-                Content="Task 3: (Pending)" 
-                Click="BtnTask3_Click"/>
+        <Button x:Name="BtnDummySection" Grid.Row="2" Margin="0,5" Padding="10"
+                Content="Task 3: Create Dummy Section"
+                FontWeight="Bold" Background="#0078D7" Foreground="White"
+                Click="BtnDummySection_Click"/>
 
-        <Button x:Name="BtnTask4" Grid.Row="3" Margin="0,5" Padding="10" 
-                Content="Task 4: (Pending)" 
-                Click="BtnTask4_Click"/>
+        <Button x:Name="BtnDummyDetail" Grid.Row="3" Margin="0,5" Padding="10"
+                Content="Task 4: Create Dummy Detail"
+                FontWeight="Bold" Background="#0078D7" Foreground="White"
+                Click="BtnDummyDetail_Click"/>
         
         <TextBox x:Name="TxtLog" Grid.Row="4" Margin="0,10,0,0" 
                  TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" 

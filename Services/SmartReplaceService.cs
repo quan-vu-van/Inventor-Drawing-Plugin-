@@ -18,6 +18,8 @@ namespace InventorDrawingPlugin.Services
         public int CountHoleNoteGreen { get; private set; }
         public int CountHoleNoteRed { get; private set; }
         public int CountHoleNoteLost { get; private set; }
+        public int CountSketchRestored { get; private set; }
+        public int CountSketchLost { get; private set; }
 
         // --- DNA Classes ---
         private class DimDNA
@@ -238,6 +240,13 @@ namespace InventorDrawingPlugin.Services
                 _log($"Tong DNA: {dimBank.Count} dim, {noteBank.Count} note, {holeNoteBank.Count} hole note");
 
                 // ==========================================
+                // BUOC 1.5: TRICH XUAT SKETCH CONSTRAINTS
+                // ==========================================
+                _log("--- BUOC 1.5: Trich xuat sketch constraints ---");
+                var sketchService = new SketchConstraintService(_inventorApp, _log);
+                sketchService.ExtractAndClean(dwgDoc);
+
+                // ==========================================
                 // BUOC 2: REPLACE MODEL
                 // ==========================================
                 _log("--- BUOC 2: Replace Model ---");
@@ -419,16 +428,26 @@ namespace InventorDrawingPlugin.Services
                     }
                 }
 
+                // ==========================================
+                // BUOC 4: KHOI PHUC SKETCH CONSTRAINTS
+                // ==========================================
+                _log("--- BUOC 4: Khoi phuc sketch constraints ---");
+                sketchService.Restore(dwgDoc);
+                CountSketchRestored = sketchService.CountConstraintRestored;
+                CountSketchLost = sketchService.CountConstraintLost;
+
                 // --- Bao cao tong ket ---
                 _log("=========================================");
                 _log($"KET QUA:");
                 _log($"  Dim:      XANH={CountGreen}, DO={CountRed}, MAT={CountLost}");
                 _log($"  Note:     XANH={CountNoteGreen}, MAT={CountNoteLost}");
                 _log($"  HoleNote: XANH={CountHoleNoteGreen}, DO={CountHoleNoteRed}, MAT={CountHoleNoteLost}");
+                _log($"  Sketch:   RESTORED={CountSketchRestored}, LOST={CountSketchLost}");
                 int totalDim = CountGreen + CountRed + CountLost;
                 int totalAll = totalDim + CountNoteGreen + CountNoteLost
-                             + CountHoleNoteGreen + CountHoleNoteRed + CountHoleNoteLost;
-                int totalGreen = CountGreen + CountNoteGreen + CountHoleNoteGreen;
+                             + CountHoleNoteGreen + CountHoleNoteRed + CountHoleNoteLost
+                             + CountSketchRestored + CountSketchLost;
+                int totalGreen = CountGreen + CountNoteGreen + CountHoleNoteGreen + CountSketchRestored;
                 if (totalAll > 0)
                 {
                     _log($"  Tong: {totalGreen}/{totalAll} thanh cong ({(double)totalGreen / totalAll * 100:F1}%)");
