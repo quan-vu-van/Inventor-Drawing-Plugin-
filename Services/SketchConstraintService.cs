@@ -379,7 +379,7 @@ namespace InventorDrawingPlugin.Services
                         ConstraintType = "TwoPointDistance",
                         UserEntityPos = sketch.SketchToSheetSpace(userPt.Geometry),
                         UserEntityType = "Point",
-                        DimValue = tpd.Parameter.Value,
+                        DimValue = (double)tpd.Parameter.Value,
                         TextPoint = tpd.TextPoint,
                         Orientation = orient,
                         Driven = tpd.Driven
@@ -407,7 +407,7 @@ namespace InventorDrawingPlugin.Services
                         ConstraintType = "TwoLineAngle",
                         UserEntityPos = sketch.SketchToSheetSpace(mid),
                         UserEntityType = "Line",
-                        DimValue = tla.Parameter.Value,
+                        DimValue = (double)tla.Parameter.Value,
                         TextPoint = tla.TextPoint,
                         Driven = tla.Driven
                     });

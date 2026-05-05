@@ -1,111 +1,84 @@
 using System;
-using System.Runtime.InteropServices;
-using System.Drawing;
 using System.IO;
-using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Inventor;
-using InventorDrawingPlugin.Views;     // Đã đổi namespace
-using InventorDrawingPlugin.Services;  // Đã đổi namespace
-using System.Windows.Forms.Integration;
-using InventorDrawingPlugin.Helpers;   // Đã đổi namespace
+using InventorDrawingPlugin.Services;
+using MCG.Inventor.Ribbon;
 
-// ĐỔI NAMESPACE TỔNG
-namespace InventorDrawingPlugin 
+namespace InventorDrawingPlugin
 {
-    // GUID MỚI KHỚP VỚI FILE .ADDIN
+    /// <summary>
+    /// Entry point cho add-in MCG_InventorCreateDummyDetailSection.
+    /// Theo pattern JIT-safe: Activate → ActivateInternal [NoInlining] de exception
+    /// trong dependency loading khong propagate ra Inventor (gay mat Vault/Content Centre).
+    /// </summary>
     [Guid("9D0B4403-518D-40C6-98AC-CD2FF878B309")]
+    [ClassInterface(ClassInterfaceType.None)]
+    [ComVisible(true)]
     public class StandardAddInServer : ApplicationAddInServer
     {
-        private Inventor.Application _inventorApp;
-        private DockableWindow _dockableWindow;
-        private MainPalette _paletteControl;
-        // Bỏ SelectionService của PickData đi vì Add-in này chỉ tập trung vào Drawing
-        private ElementHost _elementHost; 
-        private ButtonDefinition _toggleButtonDef; 
+        private const string ADDIN_GUID = "{9D0B4403-518D-40C6-98AC-CD2FF878B309}";
+        private const string LOG_DIR    = @"C:\CustomTools\Inventor\logs";
+        private const string LOG_FILE   = @"C:\CustomTools\Inventor\logs\MCG_InventorCreateDummyDetailSection.log";
 
-        public void Activate(ApplicationAddInSite addInSiteObject, bool firstTime)
-        {
-            _inventorApp = addInSiteObject.Application;
-            UserInterfaceManager uiMan = _inventorApp.UserInterfaceManager;
+        private Inventor.Application _app;
+        private MCGRibbonManager _ribbon;
 
-            _paletteControl = new MainPalette(_inventorApp);
-            _elementHost = new ElementHost { Dock = System.Windows.Forms.DockStyle.Fill, Child = _paletteControl };
-
-            // Tên định danh cửa sổ cũng phải đổi để không trùng với PickData
-            _dockableWindow = uiMan.DockableWindows.Add(Guid.NewGuid().ToString(), "InternalName_DrawingFastTools", "Drawing Center");
-            _dockableWindow.AddChild(_elementHost.Handle);
-            // Dock vao canh phai voi chieu rong 320px
-            _dockableWindow.DockingState = DockingStateEnum.kDockRight;
-            _dockableWindow.Width = 320;
-            _dockableWindow.Visible = false;
-
-            System.Windows.Forms.Integration.ElementHost.EnableModelessKeyboardInterop(new System.Windows.Window());
-
-            CreateRibbonButton(firstTime);
-        }
-
-        private void CreateRibbonButton(bool firstTime)
+        public void Activate(ApplicationAddInSite site, bool firstTime)
         {
             try
             {
-                ControlDefinitions controlDefs = _inventorApp.CommandManager.ControlDefinitions;
-                object icondata16 = null; object icondata32 = null;
+                ActivateInternal(site, firstTime);
+                DeleteLogFile(); // success → xoa log
+            }
+            catch (Exception ex)
+            {
+                LogToFile("Activate", ex);
+                // KHONG re-throw — tranh phan via Vault/Content Centre
+            }
+        }
 
-                try {
-                    Assembly asm = Assembly.GetExecutingAssembly();
-                    using (Stream s16 = asm.GetManifestResourceStream("InventorPlugin.Resources.icondata16.png"))
-                    using (Stream s32 = asm.GetManifestResourceStream("InventorPlugin.Resources.icondata32.png")) {
-                        if (s16 != null && s32 != null) {
-                            icondata16 = PictureDispConverter.ToIPictureDisp(new Bitmap(s16));
-                            icondata32 = PictureDispConverter.ToIPictureDisp(new Bitmap(s32));
-                        }
-                    }
-                } catch { }
-
-                try {
-                    _toggleButtonDef = (ButtonDefinition)controlDefs["InventorDrawingPlugin.ToggleButton.v4"];
-                } catch {
-                    _toggleButtonDef = controlDefs.AddButtonDefinition(
-                        "Drawing\nTools", "InventorDrawingPlugin.ToggleButton.v4", 
-                        CommandTypesEnum.kShapeEditCmdType, 
-                        "{9D0B4403-518D-40C6-98AC-CD2FF878B309}", // GUID MỚI
-                        "Công cụ xử lý bản vẽ", "Drawing Tools", icondata16, icondata32);
-                }
-
-                _toggleButtonDef.OnExecute += (NameValueMap Context) =>
-                {
-                    if (_dockableWindow != null) _dockableWindow.Visible = !_dockableWindow.Visible;
-                };
-
-                // Chỉ hiện trong môi trường Drawing
-                string[] targetEnvironments = { "Drawing" };
-
-                foreach (string envName in targetEnvironments) {
-                    try {
-                        Ribbon ribbon = _inventorApp.UserInterfaceManager.Ribbons[envName];
-                        RibbonTab addinTab = ribbon.RibbonTabs["id_AddInsTab"];
-                        RibbonPanel panel;
-                        try { panel = addinTab.RibbonPanels["id_Panel_DrawingPlugin"]; }
-                        catch { panel = addinTab.RibbonPanels.Add("Drawing Tools", "id_Panel_DrawingPlugin", "{9D0B4403-518D-40C6-98AC-CD2FF878B309}"); }
-
-                        bool exists = false;
-                        foreach (CommandControl ctrl in panel.CommandControls) { if (ctrl.InternalName == "InventorDrawingPlugin.ToggleButton.v4") exists = true; }
-                        if (!exists) panel.CommandControls.AddButton(_toggleButtonDef, true);
-                    } catch { }
-                }
-            } catch { }
+        // NoInlining BAT BUOC: JIT compile method body khi method duoc goi.
+        // Neu thieu DLL phu thuoc, JIT exception van g ra TRUOC try/catch o cung method.
+        // Tach sang method khac + NoInlining → exception propagate UP vao try/catch
+        // cua Activate, khong thoat ra Inventor.
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void ActivateInternal(ApplicationAddInSite site, bool firstTime)
+        {
+            _app = site.Application;
+            _ribbon = new MCGRibbonManager(_app, ADDIN_GUID);
+            _ribbon.RegisterTool(new DummyToolsDescriptor(_app));
+            _ribbon.Build(firstTime);
         }
 
         public void Deactivate()
         {
-            if (_dockableWindow != null) _dockableWindow.Delete();
-            if (_elementHost != null) _elementHost.Dispose();
-            Marshal.ReleaseComObject(_inventorApp);
-            _inventorApp = null;
-            GC.Collect();
+            try { _ribbon?.Cleanup(); }
+            catch (Exception ex) { LogToFile("Deactivate", ex); }
+            _ribbon = null;
+            _app = null;
         }
 
         public void ExecuteCommand(int commandID) { }
         public object Automation => null;
+
+        // ─── File logger ─────────────────────────────────────────────
+        private static void LogToFile(string phase, Exception ex)
+        {
+            try
+            {
+                if (!Directory.Exists(LOG_DIR)) Directory.CreateDirectory(LOG_DIR);
+                System.IO.File.AppendAllText(LOG_FILE,
+                    $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {phase} ERROR: {ex.Message}\n{ex.StackTrace}\n\n");
+            }
+            catch { }
+        }
+
+        private static void DeleteLogFile()
+        {
+            try { if (System.IO.File.Exists(LOG_FILE)) System.IO.File.Delete(LOG_FILE); }
+            catch { }
+        }
     }
 }

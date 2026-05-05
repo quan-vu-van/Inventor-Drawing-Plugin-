@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCG Create Dummy Detail/Section — Instructions</title>
+<style>
+  :root {
+    --accent:      #0078D4;
+    --accent-dark: #005A9E;
+    --bg:          #FFFFFF;
+    --surface:     #F3F6FA;
+    --surface2:    #E8EFF8;
+    --border:      #D0D7DE;
+    --text:        #1A1A2E;
+    --muted:       #5A6478;
+    --green:       #1B7F3A;
+    --green-bg:    #EAF6ED;
+    --warn:        #7D4E00;
+    --warn-bg:     #FFF8E1;
+    --note-bg:     #EBF3FF;
+    --code-bg:     #EEF1F5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text);
+    background: var(--bg);
+  }
+
+  .layout { display: flex; min-height: 100vh; }
+
+  nav {
+    width: 230px;
+    min-width: 210px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 20px 0 32px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  nav .brand {
+    padding: 0 16px 16px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+  }
+  nav .brand-title { font-size: 13px; font-weight: 700; color: var(--accent); display: block; }
+  nav .brand-sub   { font-size: 11px; color: var(--muted); margin-top: 2px; display: block; }
+  nav ul { list-style: none; padding: 0 6px; }
+  nav li { margin: 1px 0; }
+  nav a {
+    display: block;
+    padding: 5px 12px;
+    color: var(--text);
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 13px;
+  }
+  nav a:hover { background: var(--surface2); color: var(--accent); }
+  nav .nav-group {
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #E8590C;
+    padding: 16px 12px 6px;
+    margin-top: 4px;
+    border-bottom: 1.5px solid #FFB84D;
+  }
+  nav a.sub { padding-left: 22px; color: var(--muted); font-size: 12.5px; }
+  nav a.sub:hover { color: var(--accent); }
+
+  main {
+    flex: 1;
+    padding: 36px 52px 72px 44px;
+    max-width: 880px;
+  }
+
+  h1 { font-size: 26px; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-bottom: 6px; }
+  .subtitle { color: var(--muted); font-size: 13px; margin-bottom: 32px; }
+  h2 { font-size: 17px; margin: 40px 0 12px; padding: 7px 12px; background: var(--surface); border-left: 3px solid var(--accent); border-radius: 2px; scroll-margin-top: 20px; }
+  h3 { font-size: 14.5px; margin: 22px 0 8px; color: var(--muted); scroll-margin-top: 20px; }
+  p  { margin: 6px 0 12px; }
+  ul, ol { padding-left: 22px; margin: 6px 0 14px; }
+  li { margin: 4px 0; }
+
+  code {
+    font-family: Consolas, 'SF Mono', monospace;
+    font-size: 12px;
+    background: var(--code-bg);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+  kbd {
+    font-family: Consolas, monospace;
+    font-size: 11.5px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom-width: 2px;
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+  .btn {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 12.5px;
+  }
+  .btn-primary {
+    background: var(--accent);
+    border-color: var(--accent-dark);
+    color: white;
+  }
+
+  .tip, .note, .warn {
+    padding: 9px 14px;
+    margin: 12px 0;
+    border-radius: 3px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .tip  { background: var(--green-bg); border-left: 3px solid #2E7D32; color: var(--green); }
+  .note { background: var(--note-bg);  border-left: 3px solid var(--accent); color: #1a4080; }
+  .warn { background: var(--warn-bg);  border-left: 3px solid #F9A825; color: var(--warn); }
+
+  table { border-collapse: collapse; width: 100%; margin: 10px 0 16px; font-size: 13px; }
+  th, td { border: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+  th { background: var(--surface); font-weight: 600; }
+  tr:nth-child(even) td { background: #FAFBFC; }
+
+  .steps { list-style: none; padding: 0; counter-reset: step; margin: 10px 0 16px; }
+  .steps > li {
+    counter-increment: step;
+    display: flex;
+    gap: 12px;
+    margin: 8px 0;
+    align-items: flex-start;
+  }
+  .steps > li::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 24px; height: 24px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0 24px;
+  }
+  .feature-card {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: var(--text);
+    background: white;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    display: block;
+  }
+  .feature-card:hover { border-color: var(--accent); box-shadow: 0 2px 8px rgba(0,120,212,0.12); }
+  .feature-card .fc-icon  { font-size: 20px; display: block; margin-bottom: 6px; }
+  .feature-card .fc-title { font-size: 13.5px; font-weight: 700; color: var(--accent); display: block; margin-bottom: 4px; }
+  .feature-card .fc-desc  { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+
+  .tree {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 12px 16px;
+    font-family: Consolas, monospace;
+    font-size: 12.5px;
+    line-height: 1.9;
+    margin: 10px 0 14px;
+  }
+  .tree .dir  { color: var(--accent); font-weight: 600; }
+  .tree .cmt  { color: var(--muted); }
+
+  footer {
+    margin-top: 56px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ════════════ SIDEBAR ════════════ -->
+<nav>
+  <div class="brand">
+    <span class="brand-title">Dummy Detail / Section</span>
+    <span class="brand-sub">MCG Inventor Add-In · v1.0.0</span>
+  </div>
+  <ul>
+    <li><span class="nav-group">Getting Started</span></li>
+    <li><a href="#requirements">System Requirements</a></li>
+    <li><a href="#install">Installation</a></li>
+    <li><a href="#open-panel">Opening the Panel</a></li>
+
+    <li><span class="nav-group">Symbols Setup</span></li>
+    <li><a href="#symbols-required">Required Section Symbols</a></li>
+    <li><a href="#symbols-import">Importing Symbols</a></li>
+
+    <li><span class="nav-group">Features</span></li>
+    <li><a href="#dummy-section">Create Dummy Section</a></li>
+    <li><a href="#dummy-detail">Create Dummy Detail</a></li>
+
+    <li><span class="nav-group">Reference</span></li>
+    <li><a href="#stub-length">Stub Length Formula</a></li>
+    <li><a href="#status-bar">Status Bar Prompts</a></li>
+    <li><a href="#tips">Troubleshooting</a></li>
+  </ul>
+</nav>
+
+<!-- ════════════ MAIN ════════════ -->
+<main>
+
+<h1>MCG Create Dummy Detail / Section</h1>
+<p class="subtitle">Autodesk Inventor 2023 · Drawing Add-In · v1.0.0</p>
+
+<p>
+  <strong>Create Dummy Detail/Section</strong> is a palette tool for Autodesk Inventor 2023 that lets you place
+  <strong>visual section markers</strong> and <strong>detail boundaries</strong> on drawing documents (.idw)
+  <em>without</em> creating real Section or Detail views. The output is clean sketch geometry that exports cleanly to AutoCAD DWG.
+</p>
+
+<div class="tip">
+  <strong>Why "dummy"?</strong> Real Inventor Section/Detail views generate extra hidden geometry and view objects
+  that bloat exported DWG files. This add-in places lightweight sketch markers that look identical but stay clean on export.
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SYSTEM REQUIREMENTS
+══════════════════════════════════════════════════════════ -->
+<h2 id="requirements">System Requirements</h2>
+<table>
+  <tr><th style="width:180px">Component</th><th>Required</th></tr>
+  <tr><td>Autodesk Inventor</td><td>2023 (version 27.x or later)</td></tr>
+  <tr><td>Operating System</td><td>Windows 10 / 11 (64-bit)</td></tr>
+  <tr><td>.NET Framework</td><td>4.8 (pre-installed on Windows 10 v1903+)</td></tr>
+  <tr><td>Administrator rights</td><td>Not required</td></tr>
+</table>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     INSTALLATION
+══════════════════════════════════════════════════════════ -->
+<h2 id="install">Installation</h2>
+
+<h3>Package contents</h3>
+<div class="tree">
+  <span class="dir">MCG_InventorCreateDummyDetailSection_v1.0.0/</span><br>
+  &nbsp;&nbsp;├─ <span class="file">MCG_InventorCreateDummyDetailSection.dll</span>      <span class="cmt">← add-in library</span><br>
+  &nbsp;&nbsp;├─ <span class="file">MCG_InventorCreateDummyDetailSection.addin</span>     <span class="cmt">← Inventor descriptor</span><br>
+  &nbsp;&nbsp;├─ <span class="file">Symbol Sections.idw</span>                            <span class="cmt">← section symbol library</span><br>
+  &nbsp;&nbsp;├─ <span class="file">Install_AutoLoadInventorAddin.bat</span>              <span class="cmt">← installer script</span><br>
+  &nbsp;&nbsp;└─ <span class="file">Instructions.html</span>                              <span class="cmt">← this file</span>
+</div>
+
+<h3>Steps</h3>
+<ol class="steps">
+  <li>
+    <div>
+      <strong>Close Autodesk Inventor</strong> if it is currently running.
+    </div>
+  </li>
+  <li>
+    <div>
+      <strong>Copy all files</strong> below into <code>C:\CustomTools\Inventor\</code>
+      (create the folder if it does not exist):
+      <ul>
+        <li><code>MCG_InventorCreateDummyDetailSection.dll</code></li>
+        <li><code>MCG_InventorCreateDummyDetailSection.addin</code></li>
+        <li><code>Symbol Sections.idw</code></li>
+        <li><code>Install_AutoLoadInventorAddin.bat</code></li>
+      </ul>
+      Final layout:
+      <div class="tree" style="margin-top:6px;">
+        <span class="dir">C:\CustomTools\Inventor\</span><br>
+        &nbsp;&nbsp;├─ MCG_InventorCreateDummyDetailSection.dll<br>
+        &nbsp;&nbsp;├─ MCG_InventorCreateDummyDetailSection.addin<br>
+        &nbsp;&nbsp;├─ Symbol Sections.idw<br>
+        &nbsp;&nbsp;└─ Install_AutoLoadInventorAddin.bat
+      </div>
+    </div>
+  </li>
+  <li>
+    <div>
+      <strong>Run <code>Install_AutoLoadInventorAddin.bat</code></strong>
+      (double-click it inside <code>C:\CustomTools\Inventor\</code>).<br>
+      The script scans the folder for <code>*.addin</code> files and copies them into
+      <code>%APPDATA%\Autodesk\Inventor 2023\Addins\</code> so Inventor will discover the add-in on startup.
+      The DLL and Symbol Sections.idw stay in <code>C:\CustomTools\Inventor\</code> — the .addin file references them by absolute path.
+      Press any key to close the script window when it shows <em>Success</em>.
+    </div>
+  </li>
+  <li>
+    <div>
+      <strong>Open Autodesk Inventor 2023</strong> and open any <strong>Drawing (.idw)</strong> file.
+    </div>
+  </li>
+  <li>
+    <div>
+      <strong>Verify the add-in loaded</strong>:
+      <ul>
+        <li>Look for the <strong>MCG TOOLS</strong> tab in the ribbon → <strong>Drawing</strong> panel → <strong>Dummy Tools</strong> button.</li>
+        <li>Or go to <em>Tools → Add-In Manager</em> and confirm <strong>MCG_InventorCreateDummyDetailSection</strong> is listed and ticked as Loaded.</li>
+      </ul>
+      If the button does not appear, see <a href="#tips">Troubleshooting</a>.
+    </div>
+  </li>
+</ol>
+
+<div class="warn">
+  <strong>Important:</strong> <code>Symbol Sections.idw</code> must remain in <code>C:\CustomTools\Inventor\</code> alongside the DLL.
+  The add-in opens this file automatically when section symbols are missing from your drawing.
+</div>
+
+<div class="tip">
+  <strong>Multiple add-ins:</strong> the same script handles any number of MCG add-ins — drop more
+  <code>*.dll</code> + <code>*.addin</code> file pairs into <code>C:\CustomTools\Inventor\</code> and run the script again.
+  All MCG add-ins will share the same <strong>MCG TOOLS</strong> ribbon tab.
+</div>
+
+<div class="note">
+  <strong>Uninstall:</strong> close Inventor, then delete
+  <code>MCG_InventorCreateDummyDetailSection.dll</code> from <code>C:\CustomTools\Inventor\</code>
+  and <code>MCG_InventorCreateDummyDetailSection.addin</code> from
+  <code>%APPDATA%\Autodesk\Inventor 2023\Addins\</code>.
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     OPENING THE PANEL
+══════════════════════════════════════════════════════════ -->
+<h2 id="open-panel">Opening the Panel</h2>
+<ol class="steps">
+  <li><div>Open a <strong>Drawing (.idw)</strong> file in Inventor 2023.</div></li>
+  <li><div>Click the <strong>MCG TOOLS</strong> tab in the ribbon.</div></li>
+  <li><div>In the <strong>Drawing</strong> panel, click <strong>Dummy Tools</strong>.</div></li>
+  <li><div>The Drawing Center palette opens and docks to the right side of the screen.</div></li>
+</ol>
+
+<div class="note">
+  The <strong>Dummy Tools</strong> button is only available in the <strong>Drawing environment</strong>.
+  The MCG TOOLS tab itself appears on Part, Assembly, and Drawing ribbons (shared with other MCG add-ins),
+  but the Dummy Tools button only shows when a <code>.idw</code> drawing is active.
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     SYMBOLS REQUIRED
+══════════════════════════════════════════════════════════ -->
+<h2 id="symbols-required">Required Section Symbols</h2>
+<p>
+  Creating a dummy section requires <strong>4 SketchedSymbol definitions</strong> to exist in your drawing.
+  These are the section arrow markers, one for each viewing direction:
+</p>
+<table>
+  <tr><th style="width:180px">Symbol Name</th><th>Use</th></tr>
+  <tr><td><code>SECTION_L-R</code></td><td>Vertical section line, viewing direction <strong>Left → Right</strong></td></tr>
+  <tr><td><code>SECTION_R-L</code></td><td>Vertical section line, viewing direction <strong>Right → Left</strong></td></tr>
+  <tr><td><code>SECTION_U-D</code></td><td>Horizontal section line, viewing direction <strong>Up → Down</strong> (top-to-bottom)</td></tr>
+  <tr><td><code>SECTION_D-U</code></td><td>Horizontal section line, viewing direction <strong>Down → Up</strong> (bottom-to-top)</td></tr>
+</table>
+
+<div class="tip">
+  These symbols are provided in <code>Symbol Sections.idw</code> shipped with the add-in.
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     IMPORTING SYMBOLS — MANUAL ONE-TIME COPY
+══════════════════════════════════════════════════════════ -->
+<h2 id="symbols-import">Importing Symbols (one-time per drawing)</h2>
+
+<p>
+  When you click <strong>Create Dummy Section</strong> on a drawing that does not yet have the 4 required symbols,
+  the add-in <strong>automatically opens <code>Symbol Sections.idw</code></strong> and shows a dialog with import instructions.
+  You then copy the symbols once via Inventor's UI — they stay in the drawing forever after.
+</p>
+
+<h3>Why a one-time manual copy?</h3>
+<p>
+  Inventor's API for copying SketchedSymbol definitions does not transfer the <strong>solid hatch fill</strong>
+  used in the arrow heads. Manual copy through Inventor's UI preserves everything intact.
+</p>
+
+<h3>How to copy</h3>
+<ol class="steps">
+  <li><div>Click <strong>Create Dummy Section</strong> in the palette.</div></li>
+  <li><div>If symbols are missing, the add-in opens <code>Symbol Sections.idw</code> and shows a dialog.</div></li>
+  <li>
+    <div>
+      In the <strong>opened library file's Browser tree</strong>, expand <strong>Sketched Symbols</strong>.
+    </div>
+  </li>
+  <li>
+    <div>
+      For each symbol (<code>SECTION_L-R</code>, <code>SECTION_R-L</code>, <code>SECTION_U-D</code>, <code>SECTION_D-U</code>):
+      <ul>
+        <li><strong>Right-click</strong> the symbol name → <strong>Copy</strong>.</li>
+      </ul>
+    </div>
+  </li>
+  <li>
+    <div>
+      <strong>Switch back</strong> to your own drawing (Window menu or click the file tab).
+    </div>
+  </li>
+  <li>
+    <div>
+      In your drawing's Browser, <strong>right-click</strong> the <strong>Sketched Symbols</strong> node →
+      <strong>Paste</strong> (repeat for each symbol).
+    </div>
+  </li>
+  <li>
+    <div>Click <strong>Create Dummy Section</strong> again — the workflow now proceeds.</div>
+  </li>
+</ol>
+
+<div class="note">
+  After copying once, the 4 symbols stay permanently in your drawing. Subsequent dummy sections in this drawing run instantly without prompting.
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     FEATURE — DUMMY SECTION
+══════════════════════════════════════════════════════════ -->
+<h2 id="dummy-section">Create Dummy Section</h2>
+<p>
+  Places two section arrow symbols connected by a 50&nbsp;mm sketch stub on each end, simulating a real Section view's section line — without creating a Section view.
+</p>
+
+<h3>Workflow</h3>
+<ol class="steps">
+  <li>
+    <div>
+      <em>(Optional)</em> Pre-select a <strong>DrawingView</strong> on the drawing.
+      If you do, the add-in skips the "Click VIEW" step and uses the selected view directly.
+    </div>
+  </li>
+  <li><div>Click <strong>Create Dummy Section</strong> in the palette.</div></li>
+  <li><div><strong>Click on a VIEW</strong> in the drawing (skipped if a view was pre-selected).</div></li>
+  <li><div><strong>Click START point</strong> of the section line.</div></li>
+  <li><div><strong>Click END point</strong>. The point auto-snaps to horizontal or vertical alignment with the start. A dashed preview line follows the cursor.</div></li>
+  <li><div><strong>Click DIRECTION side</strong> — the side from which the section is being viewed.</div></li>
+  <li><div>A popup asks for the <strong>section name</strong> (e.g., <code>A1</code>). Press OK.</div></li>
+  <li><div>The add-in places the correct directional symbol at both ends and writes the name into the symbol's prompt field.</div></li>
+</ol>
+
+<h3>What is created</h3>
+<ul>
+  <li>2 sketch line stubs (each 50&nbsp;mm × view scale denominator) at the ends of the section line, dash-dotted.</li>
+  <li>2 SketchedSymbol instances at the midpoints of the stubs, with the section name written in the middle prompt field.</li>
+  <li>Dimension constraint of 50&nbsp;mm × scale denominator on each stub.</li>
+  <li>Collinear and Horizontal/Vertical constraints between the two stubs.</li>
+</ul>
+
+<div class="note">
+  <strong>Right-click</strong> at any time during picking to cancel.
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     FEATURE — DUMMY DETAIL
+══════════════════════════════════════════════════════════ -->
+<h2 id="dummy-detail">Create Dummy Detail</h2>
+<p>
+  Places a detail boundary (circle or rectangle) with a label on the drawing, simulating a real Detail view callout — without creating a Detail view.
+</p>
+
+<h3>Workflow</h3>
+<ol class="steps">
+  <li>
+    <div>
+      <em>(Optional)</em> Pre-select a <strong>DrawingView</strong> on the drawing to skip the view-pick step.
+    </div>
+  </li>
+  <li><div>Click <strong>Create Dummy Detail</strong>. A floating dialog appears.</div></li>
+  <li>
+    <div>
+      Configure in the dialog:
+      <ul>
+        <li><strong>Detail name</strong> — e.g., <code>A</code></li>
+        <li>Boundary shape — <strong>Circle</strong> or <strong>Rectangle</strong></li>
+        <li><strong>Connection line</strong> — checked: draws a leader to a separate label position; unchecked: places label directly next to the boundary</li>
+      </ul>
+      Click OK.
+    </div>
+  </li>
+  <li><div><strong>Click on a VIEW</strong> (skipped if pre-selected).</div></li>
+  <li>
+    <div>
+      For <strong>Circle</strong>: click <strong>CENTER</strong>, then <strong>edge point</strong> (defines radius).<br>
+      For <strong>Rectangle</strong>: click <strong>CORNER 1</strong>, then <strong>CORNER 2</strong> (opposite).<br>
+      A live preview of the shape follows the cursor.
+    </div>
+  </li>
+  <li><div><strong>Click LABEL position</strong> — where the text label should appear. A live connection-line preview follows the cursor (if connection line is enabled).</div></li>
+  <li><div>The add-in creates the boundary, optional connection line + underline, and the label text.</div></li>
+</ol>
+
+<h3>What is created</h3>
+<ul>
+  <li>Boundary geometry (circle or rectangle) in dash-dotted style with a dimension constraint (radius for circle, width + height for rectangle).</li>
+  <li>If connection line is enabled: a dash-dotted line from boundary to label position, plus a horizontal underline shelf, plus the label text on top of the shelf.</li>
+  <li>If connection line is disabled: just the label text at the picked position.</li>
+  <li>Label text uses the <strong>ISOCPEUR</strong> font at <strong>5.25 mm</strong> height.</li>
+</ul>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     REFERENCE — STUB LENGTH
+══════════════════════════════════════════════════════════ -->
+<h2 id="stub-length">Stub Length Formula</h2>
+<p>
+  Section stubs scale automatically with the view's scale ratio so they remain readable at any zoom level.
+</p>
+<p>
+  <code>Stub length on paper = 4 × scale denominator (mm)</code>
+</p>
+<table>
+  <tr><th>View Scale</th><th>Stub on paper</th></tr>
+  <tr><td>1:5</td><td>20 mm</td></tr>
+  <tr><td>1:10</td><td>40 mm</td></tr>
+  <tr><td>1:15</td><td>60 mm</td></tr>
+  <tr><td>1:20</td><td>80 mm</td></tr>
+  <tr><td>1:50</td><td>200 mm</td></tr>
+  <tr><td>1:100</td><td>400 mm</td></tr>
+</table>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     REFERENCE — STATUS BAR
+══════════════════════════════════════════════════════════ -->
+<h2 id="status-bar">Status Bar Prompts</h2>
+<p>
+  All step-by-step instructions appear in the Inventor <strong>status bar at the bottom of the window</strong>.
+  Watch the status bar for guidance after clicking each Create button.
+</p>
+<table>
+  <tr><th style="width:200px">Status Bar Message</th><th>Action</th></tr>
+  <tr><td><code>SECTION: Click on the VIEW...</code></td><td>Click on a DrawingView.</td></tr>
+  <tr><td><code>SECTION: Click START point...</code></td><td>Click first endpoint of section line.</td></tr>
+  <tr><td><code>SECTION: Click END point...</code></td><td>Click second endpoint (snaps H/V).</td></tr>
+  <tr><td><code>SECTION: Click DIRECTION side...</code></td><td>Click the side you are viewing from.</td></tr>
+  <tr><td><code>DETAIL: Click CENTER / CORNER 1...</code></td><td>Click first point of boundary.</td></tr>
+  <tr><td><code>DETAIL: Click edge point / CORNER 2...</code></td><td>Click second point of boundary.</td></tr>
+  <tr><td><code>DETAIL: Click LABEL position</code></td><td>Click where the label should appear.</td></tr>
+  <tr><td><code>... created successfully!</code></td><td>Operation complete.</td></tr>
+</table>
+
+
+<!-- ══════════════════════════════════════════════════════════
+     TROUBLESHOOTING
+══════════════════════════════════════════════════════════ -->
+<h2 id="tips">Troubleshooting</h2>
+
+<h3>Dummy Tools button is not visible in the MCG TOOLS tab</h3>
+<ul>
+  <li>Open <em>Tools → Add-In Manager</em> and check that <strong>MCG_InventorCreateDummyDetailSection</strong> is listed and ticked as Loaded.</li>
+  <li>Verify all files exist in <code>C:\CustomTools\Inventor\</code> (DLL + .addin + Symbol Sections.idw), then re-run <code>Install_AutoLoadInventorAddin.bat</code> and restart Inventor.</li>
+  <li>Check that <code>%APPDATA%\Autodesk\Inventor 2023\Addins\MCG_InventorCreateDummyDetailSection.addin</code> exists.</li>
+  <li>The button only appears in the Drawing environment — open a <code>.idw</code> file first.</li>
+  <li>If load failed, check log file at <code>C:\CustomTools\Inventor\logs\MCG_InventorCreateDummyDetailSection.log</code></li>
+</ul>
+
+<h3>Symbol arrows are missing solid fill / appear hollow</h3>
+<p>
+  This means the symbols were copied via the API fallback (which does not transfer solid hatch).
+  Delete the symbols from your drawing's Browser → Sketched Symbols, then click <strong>Create Dummy Section</strong>
+  and follow the manual copy procedure described in <a href="#symbols-import">Importing Symbols</a>.
+</p>
+
+<h3>Symbol Sections.idw not found</h3>
+<p>
+  Verify <code>Symbol Sections.idw</code> sits in the <strong>same folder as the DLL</strong>
+  (<code>C:\CustomTools\Inventor\</code>). The add-in looks for it relative to the loaded DLL location.
+</p>
+
+<h3>Status bar shows "Click ngoai view" / picking does not advance</h3>
+<p>
+  You clicked outside the bounding box of any DrawingView. Click again inside a view to select it.
+  Or: pre-select a view in the drawing (it gets highlighted), then click Create — the view-pick step is skipped.
+</p>
+
+<h3>Click at any time to cancel</h3>
+<p>
+  <strong>Right-click</strong> during any picking step to abort. The add-in cleans up and returns to idle.
+</p>
+
+<h3>Text label appears too large or wrong size</h3>
+<p>
+  The label uses a fixed paper size (5.25 mm for Detail labels). On views with extreme scale ratios the relative size may seem unusual.
+  This is correct behavior — the text is sized for the printed sheet, not the model.
+</p>
+
+<footer>
+  MCG_InventorCreateDummyDetailSection v1.0.0 &nbsp;·&nbsp; Autodesk Inventor 2023 Drawing Add-In
+</footer>
+
+</main>
+</div>
+</body>
+</html>

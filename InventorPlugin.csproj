@@ -6,7 +6,8 @@
     <UseWPF>true</UseWPF> 
     <LangVersion>latest</LangVersion>
     <Platforms>x64</Platforms>
-    <AssemblyName>InventorDrawingPlugin</AssemblyName>
+    <AssemblyName>MCG_InventorCreateDummyDetailSection</AssemblyName>
+    <RootNamespace>InventorPlugin</RootNamespace>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <InventorPath>C:\Program Files\Autodesk\Inventor 2023\Bin</InventorPath>
@@ -17,7 +18,12 @@
     <Reference Include="Autodesk.Inventor.Interop">
       <HintPath>$(InventorPath)\Public Assemblies\Autodesk.Inventor.Interop.dll</HintPath>
       <Private>False</Private>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="stdole">
+      <HintPath>$(InventorPath)\stdole.dll</HintPath>
+      <Private>False</Private>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
 
     <Reference Include="Autodesk.Connectivity.WebServices">
@@ -52,8 +58,8 @@
   </ItemGroup>
 
   <Target Name="CopyAddinFile" AfterTargets="Build">
-    <Copy SourceFiles="$(ProjectDir)InventorDrawingPlugin.addin" 
-          DestinationFolder="$(OutputPath)" 
+    <Copy SourceFiles="$(ProjectDir)MCG_InventorCreateDummyDetailSection.addin"
+          DestinationFolder="$(OutputPath)"
           OverwriteReadOnlyFiles="true" />
   </Target>
 </Project>
