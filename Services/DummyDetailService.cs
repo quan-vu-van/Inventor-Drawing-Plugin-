@@ -43,22 +43,51 @@ namespace InventorDrawingPlugin.Services
             _pt1 = null; _pt2 = null; _labelPt = null;
             _hasPreview = false;
 
+            // Neu chua co view duoc chon truoc → hien thong bao truoc khi vao interaction mode
+            if (_targetView == null)
+            {
+                System.Windows.MessageBox.Show(
+                    "Please select a VIEW on the drawing first.\n\n" +
+                    "Tip: For faster workflow, select a view BEFORE clicking 'Create Dummy Detail'.\n\n" +
+                    "After clicking OK, click on the desired view to start.",
+                    "View Required",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
+            }
+
             try
             {
                 _ie = _inventorApp.CommandManager.CreateInteractionEvents();
                 _ie.InteractionDisabled = false;
+
                 _me = _ie.MouseEvents;
                 _me.MouseMoveEnabled = true;
                 _me.PointInferenceEnabled = true;
                 _me.OnMouseClick += OnMouseClick;
                 _me.OnMouseMove += OnMouseMove;
+
                 _ie.OnTerminate += OnTerminate;
-                _inventorApp.StatusBarText = _targetView != null
-                    ? (_isCircle
+
+                if (_targetView == null)
+                {
+                    _inventorApp.StatusBarText =
+                        ">>> Click on a VIEW to create detail on (Right-click or Esc to cancel) <<<";
+                }
+                else
+                {
+                    _inventorApp.StatusBarText = _isCircle
                         ? $"DETAIL ({_targetView.Name}): Click CENTER"
-                        : $"DETAIL ({_targetView.Name}): Click CORNER 1")
-                    : "DETAIL: Click on the VIEW";
+                        : $"DETAIL ({_targetView.Name}): Click CORNER 1";
+                }
+
                 _ie.Start();
+
+                try
+                {
+                    if (_targetView == null)
+                        _ie.SetCursor(CursorTypeEnum.kCursorBuiltInSelectView, null, null);
+                }
+                catch { }
             }
             catch (Exception ex)
             {
@@ -90,6 +119,7 @@ namespace InventorDrawingPlugin.Services
                     _targetView = FindViewAtPoint(_sheet, pt);
                     if (_targetView == null) return;
                     _step = PickStep.Point1;
+                    try { _ie.SetCursor(CursorTypeEnum.kCursorBuiltInCrosshair, null, null); } catch { }
                     _inventorApp.StatusBarText = _isCircle
                         ? $"DETAIL ({_targetView.Name}): Click CENTER"
                         : $"DETAIL ({_targetView.Name}): Click CORNER 1";

@@ -57,6 +57,10 @@
     <EmbeddedResource Include="Resources\icondata32.png" />
   </ItemGroup>
 
+  <!-- Copy .addin file den output folder cung voi DLL.
+       Khi deploy: tao subfolder "MCG_InventorCreateDummyDetailSection\" trong
+       C:\CustomTools\Inventor\ va copy .dll + .addin + Symbol Sections.idw vao do.
+       File .bat se deploy vao %APPDATA%\Inventor 2023\Addins\MCG_InventorCreateDummyDetailSection\ -->
   <Target Name="CopyAddinFile" AfterTargets="Build">
     <Copy SourceFiles="$(ProjectDir)MCG_InventorCreateDummyDetailSection.addin"
           DestinationFolder="$(OutputPath)"

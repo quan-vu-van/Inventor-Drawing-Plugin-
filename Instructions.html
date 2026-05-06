@@ -271,11 +271,12 @@
 <h3>Package contents</h3>
 <div class="tree">
   <span class="dir">MCG_InventorCreateDummyDetailSection_v1.0.0/</span><br>
-  &nbsp;&nbsp;├─ <span class="file">MCG_InventorCreateDummyDetailSection.dll</span>      <span class="cmt">← add-in library</span><br>
-  &nbsp;&nbsp;├─ <span class="file">MCG_InventorCreateDummyDetailSection.addin</span>     <span class="cmt">← Inventor descriptor</span><br>
-  &nbsp;&nbsp;├─ <span class="file">Symbol Sections.idw</span>                            <span class="cmt">← section symbol library</span><br>
-  &nbsp;&nbsp;├─ <span class="file">Install_AutoLoadInventorAddin.bat</span>              <span class="cmt">← installer script</span><br>
-  &nbsp;&nbsp;└─ <span class="file">Instructions.html</span>                              <span class="cmt">← this file</span>
+  &nbsp;&nbsp;├─ <span class="dir">MCG_InventorCreateDummyDetailSection/</span>                         <span class="cmt">← add-in subfolder</span><br>
+  &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├─ <span class="file">MCG_InventorCreateDummyDetailSection.dll</span>     <span class="cmt">← add-in library</span><br>
+  &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├─ <span class="file">MCG_InventorCreateDummyDetailSection.addin</span>    <span class="cmt">← Inventor descriptor</span><br>
+  &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└─ <span class="file">Symbol Sections.idw</span>                           <span class="cmt">← section symbol library</span><br>
+  &nbsp;&nbsp;├─ <span class="file">Install_AutoLoadInventorAddin.bat</span>                          <span class="cmt">← installer script (MCG_* scanner)</span><br>
+  &nbsp;&nbsp;└─ <span class="file">Instructions.html</span>                                          <span class="cmt">← this file</span>
 </div>
 
 <h3>Steps</h3>
@@ -287,20 +288,16 @@
   </li>
   <li>
     <div>
-      <strong>Copy all files</strong> below into <code>C:\CustomTools\Inventor\</code>
-      (create the folder if it does not exist):
-      <ul>
-        <li><code>MCG_InventorCreateDummyDetailSection.dll</code></li>
-        <li><code>MCG_InventorCreateDummyDetailSection.addin</code></li>
-        <li><code>Symbol Sections.idw</code></li>
-        <li><code>Install_AutoLoadInventorAddin.bat</code></li>
-      </ul>
+      <strong>Copy</strong> the entire <code>MCG_InventorCreateDummyDetailSection/</code> subfolder
+      <strong>plus</strong> <code>Install_AutoLoadInventorAddin.bat</code> into <code>C:\CustomTools\Inventor\</code>
+      (create the folder if it does not exist).<br>
       Final layout:
       <div class="tree" style="margin-top:6px;">
         <span class="dir">C:\CustomTools\Inventor\</span><br>
-        &nbsp;&nbsp;├─ MCG_InventorCreateDummyDetailSection.dll<br>
-        &nbsp;&nbsp;├─ MCG_InventorCreateDummyDetailSection.addin<br>
-        &nbsp;&nbsp;├─ Symbol Sections.idw<br>
+        &nbsp;&nbsp;├─ <span class="dir">MCG_InventorCreateDummyDetailSection\</span><br>
+        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├─ MCG_InventorCreateDummyDetailSection.dll<br>
+        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├─ MCG_InventorCreateDummyDetailSection.addin<br>
+        &nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└─ Symbol Sections.idw<br>
         &nbsp;&nbsp;└─ Install_AutoLoadInventorAddin.bat
       </div>
     </div>
@@ -309,10 +306,10 @@
     <div>
       <strong>Run <code>Install_AutoLoadInventorAddin.bat</code></strong>
       (double-click it inside <code>C:\CustomTools\Inventor\</code>).<br>
-      The script scans the folder for <code>*.addin</code> files and copies them into
-      <code>%APPDATA%\Autodesk\Inventor 2023\Addins\</code> so Inventor will discover the add-in on startup.
-      The DLL and Symbol Sections.idw stay in <code>C:\CustomTools\Inventor\</code> — the .addin file references them by absolute path.
-      Press any key to close the script window when it shows <em>Success</em>.
+      The script scans for <code>MCG_*</code> subfolders and copies their <code>.dll</code> + <code>.addin</code>
+      pair into <code>%APPDATA%\Autodesk\Inventor 2023\Addins\&lt;AddinName&gt;\</code>.<br>
+      <code>Symbol Sections.idw</code> stays in the source subfolder — the add-in finds it there automatically.
+      Press any key to close the script window when it shows <em>Successfully activated</em>.
     </div>
   </li>
   <li>
@@ -333,21 +330,22 @@
 </ol>
 
 <div class="warn">
-  <strong>Important:</strong> <code>Symbol Sections.idw</code> must remain in <code>C:\CustomTools\Inventor\</code> alongside the DLL.
+  <strong>Important:</strong> <code>Symbol Sections.idw</code> must remain in
+  <code>C:\CustomTools\Inventor\MCG_InventorCreateDummyDetailSection\</code>.
   The add-in opens this file automatically when section symbols are missing from your drawing.
 </div>
 
 <div class="tip">
   <strong>Multiple add-ins:</strong> the same script handles any number of MCG add-ins — drop more
-  <code>*.dll</code> + <code>*.addin</code> file pairs into <code>C:\CustomTools\Inventor\</code> and run the script again.
+  <code>MCG_&lt;AddinName&gt;/</code> subfolders into <code>C:\CustomTools\Inventor\</code> and run the script again.
   All MCG add-ins will share the same <strong>MCG TOOLS</strong> ribbon tab.
 </div>
 
 <div class="note">
-  <strong>Uninstall:</strong> close Inventor, then delete
-  <code>MCG_InventorCreateDummyDetailSection.dll</code> from <code>C:\CustomTools\Inventor\</code>
-  and <code>MCG_InventorCreateDummyDetailSection.addin</code> from
+  <strong>Uninstall:</strong> close Inventor, then delete the
+  <code>MCG_InventorCreateDummyDetailSection</code> subfolder from
   <code>%APPDATA%\Autodesk\Inventor 2023\Addins\</code>.
+  Optionally also delete the source subfolder from <code>C:\CustomTools\Inventor\</code>.
 </div>
 
 
@@ -581,10 +579,10 @@
 <h3>Dummy Tools button is not visible in the MCG TOOLS tab</h3>
 <ul>
   <li>Open <em>Tools → Add-In Manager</em> and check that <strong>MCG_InventorCreateDummyDetailSection</strong> is listed and ticked as Loaded.</li>
-  <li>Verify all files exist in <code>C:\CustomTools\Inventor\</code> (DLL + .addin + Symbol Sections.idw), then re-run <code>Install_AutoLoadInventorAddin.bat</code> and restart Inventor.</li>
-  <li>Check that <code>%APPDATA%\Autodesk\Inventor 2023\Addins\MCG_InventorCreateDummyDetailSection.addin</code> exists.</li>
+  <li>Verify the source subfolder exists with all files inside: <code>C:\CustomTools\Inventor\MCG_InventorCreateDummyDetailSection\</code> containing <code>.dll</code>, <code>.addin</code>, and <code>Symbol Sections.idw</code>. Re-run <code>Install_AutoLoadInventorAddin.bat</code> and restart Inventor.</li>
+  <li>Check that <code>%APPDATA%\Autodesk\Inventor 2023\Addins\MCG_InventorCreateDummyDetailSection\</code> subfolder exists and contains the <code>.addin</code> + <code>.dll</code> files.</li>
   <li>The button only appears in the Drawing environment — open a <code>.idw</code> file first.</li>
-  <li>If load failed, check log file at <code>C:\CustomTools\Inventor\logs\MCG_InventorCreateDummyDetailSection.log</code></li>
+  <li>If load failed, check log file at <code>C:\CustomTools\Inventor\logs\MCG_InventorCreateDummyDetailSection.log</code> (file exists only on error).</li>
 </ul>
 
 <h3>Symbol arrows are missing solid fill / appear hollow</h3>
@@ -596,9 +594,14 @@
 
 <h3>Symbol Sections.idw not found</h3>
 <p>
-  Verify <code>Symbol Sections.idw</code> sits in the <strong>same folder as the DLL</strong>
-  (<code>C:\CustomTools\Inventor\</code>). The add-in looks for it relative to the loaded DLL location.
+  Verify <code>Symbol Sections.idw</code> sits in the source subfolder
+  (<code>C:\CustomTools\Inventor\MCG_InventorCreateDummyDetailSection\</code>).
+  The add-in looks for it in two locations (in order):
 </p>
+<ol>
+  <li>Same folder as the loaded DLL (<code>%APPDATA%\Autodesk\Inventor 2023\Addins\MCG_InventorCreateDummyDetailSection\</code>) — present only if you copy it there manually.</li>
+  <li>Source subfolder (<code>C:\CustomTools\Inventor\MCG_InventorCreateDummyDetailSection\</code>) — primary location where you placed it during installation.</li>
+</ol>
 
 <h3>Status bar shows "Click ngoai view" / picking does not advance</h3>
 <p>

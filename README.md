@@ -1,82 +1,120 @@
-🚢 AutoCAD .NET Plugin Template
-Template chuẩn hóa dành cho việc phát triển các công cụ trên nền tảng AutoCAD .NET API. Bộ khung này được xây dựng dựa trên kiến trúc Module hóa và nguyên lý Clean Code, giúp bóc tách dữ liệu hình học (MTO) chính xác và nhanh chóng.
+# MCG Create Dummy Detail/Section
 
-🏗️ Cấu trúc dự án (Architecture)
-Dự án được phân chia thành các Module độc lập để dễ dàng bảo trì và mở rộng:
-
-📁 Models: Chứa các lớp định nghĩa đối tượng (POCO). Tách biệt hoàn toàn với thư viện AutoCAD.
-
-📁 Services: "Trái tim" của Plugin. Chứa ExtractionService thực hiện logic
-
-📁 UI: Giao diện người dùng dựa trên WPF tích hợp vào AutoCAD PaletteSet.
-
-📁 Utilities: Các hàm tiện ích dùng chung (Tính COG, đổi đơn vị, định dạng tọa độ WCS).
-
-📁 Commands: Nơi đăng ký lệnh (CommandMethod) và quản lý vòng đời của Palette (Singleton).
-
-Test quá trình checkin = Commit (luôn phải có comments xem là nội dung thay đổi là gì)
-Quá trình checkout = Pull (kéo dự án từ Github về local)
-
-B1: Trước khi làm thì luôn PULL về để đồng bộ hóa với hệ thống
-B2: Khi kết thúc phiên làm việc thì cần Commit & Sync để đồng bộ lên hệ thống
-Note: Trường hợp xảy ra Conflict
-
-- Nhiều hơn 1 người cùng sửa 1 nội dung và up lên hệ thống?
-
-* Phân phạm vi công việc cụ thể, tránh chồng lấn
-* Nếu có chồng lấn, Github cho phép tất cả các update đó đều được thực hiện đồng bộ nhưng báo Conflict trên hệ thống, khi đó admin sẽ quyết định
-
-Module 1 <--> function a
-Module 2 <--> function a
-Module 3 <--> function a
-Nhưng khi cần thay đổi function a để các hệ thống về sau đơn giản hơn, tối ưu hơn thì một số user có thể tùy chỉnh function a này?
-
-Test chia Branch để up lên hệ thống chứ không trực tiếp commit thẳng lên nhánh main. Khi đó admin sẽ quyết định phiên bản mới có ok không, nếu có thì admin sẽ merge vào nhánh main, nếu không thì sẽ reject để làm lại
-
-Test pull from local
-HƯỚNG DẪN SỬ DỤNG NHANH ADD-IN "DATA CENTER" (INVENTOR)
-Add-in Data Center là công cụ giúp tra cứu, chỉnh sửa iProperties và đồng bộ dữ liệu Vault/BOM trực tiếp trên giao diện thiết kế 3D của Autodesk Inventor cực kỳ nhanh chóng.
+Inventor 2023 add-in for placing **dummy section markers** and **detail boundaries** on drawings without generating real Section/Detail views — keeps exported AutoCAD DWG files clean.
 
 ---
 
-1. HƯỚNG DẪN CÀI ĐẶT
-   Bước 1: Copy toàn bộ thư mục InventorDrawingPlugin (bên trong có chứa 2 file là .dll và .addin).
-   Bước 2: Dán (Paste) thư mục đó vào đường dẫn sau trên máy tính của bạn:
+## Features
 
-C:\Users\<Tên_Người_Dùng>\AppData\Roaming\Autodesk\Inventor 2023\Addins
-(Ví dụ trên máy của bạn, <Tên_Người_Dùng> sẽ là Vuqu)
+| Task | Status | Description |
+|------|--------|-------------|
+| 1. Smart Replace Model | 🟡 Pending | Shelved — Inventor proxy limitations |
+| 2. Smart Rotate View | 🟡 Pending | Shelved — Inventor proxy limitations |
+| 3. **Create Dummy Section** | ✅ Active | Section markers (4 directional symbols) with auto-stub + dimension |
+| 4. **Create Dummy Detail** | ✅ Active | Detail boundary (circle/rectangle) + connection line + ISOCPEUR label |
 
-⚠️ LƯU Ý QUAN TRỌNG: Thư mục AppData mặc định bị hệ điều hành Windows ẩn đi. Để nhìn thấy nó, bạn làm như sau:
+---
 
-Windows 10: Mở File Explorer -> Bấm lên thẻ View ở trên cùng -> Tích chọn vào ô Hidden items.
+## Project Structure
 
-Windows 11: Mở File Explorer -> Bấm nút View (Có icon con mắt hoặc menu thả xuống) -> Chọn Show -> Tích chọn Hidden items.
+```
+InventorDrawingPlugin/
+├── Core/                             # MCG portable ribbon SDK (shared with other MCG addins)
+│   ├── MCGRibbonManager.cs           # Ribbon tab + panels + dockable window manager
+│   ├── DockableWindowHost.cs         # WPF embedding into Inventor DockableWindow
+│   ├── IToolDescriptor.cs            # Tool descriptor interface
+│   ├── IDockablePanelDescriptor.cs   # Palette descriptor interface
+│   ├── PictureDispConverter.cs       # Bitmap ↔ IPictureDisp helper
+│   ├── PanelLocation.cs              # Model | Drawing | Utility
+│   └── RibbonContext.cs              # Part | Assembly | Drawing flags
+├── Services/
+│   ├── DummyToolsDescriptor.cs       # IToolDescriptor for "Dummy Tools" button
+│   ├── DummyToolsPanelDescriptor.cs  # IDockablePanelDescriptor for palette
+│   ├── DummySectionService.cs        # Task 3 logic
+│   ├── DummyDetailService.cs         # Task 4 logic
+│   ├── SmartReplaceService.cs        # Task 1 (shelved, kept for reference)
+│   ├── SmartRotateService.cs         # Task 2 (shelved, kept for reference)
+│   └── SketchConstraintService.cs    # Sketch constraint helpers
+├── Views/
+│   ├── MainPalette.xaml              # WPF palette UI
+│   └── MainPalette.xaml.cs
+├── Resources/
+│   ├── icondata16.png                # Ribbon button icon (16×16)
+│   └── icondata32.png                # Ribbon button icon (32×32)
+├── StandardAddInServer.cs            # Add-in entry point (JIT-safe pattern)
+├── MCG_InventorCreateDummyDetailSection.addin   # Inventor addin descriptor
+├── Install_AutoLoadInventorAddin.bat            # Installer script
+├── Symbol Sections.idw                           # Section symbol library (4 directional symbols)
+├── Instructions.html                             # User-facing usage guide
+└── InventorPlugin.csproj
+```
 
-2. KHỞI ĐỘNG CÔNG CỤ
-   Mở phần mềm Autodesk Inventor.
+---
 
-Mở một bản vẽ Lắp ráp (Assembly - .iam) hoặc Chi tiết (Part - .ipt) bất kỳ.
+## Build
 
-Nhìn lên thanh công cụ (Ribbon), chọn thẻ Add-Ins.
+```bash
+dotnet build
+```
 
-Tìm nhóm công cụ có tên Data Center và bấm vào nút Model Data (Có biểu tượng Icon của công ty).
+Output: `bin/Debug/MCG_InventorCreateDummyDetailSection.dll` + `MCG_InventorCreateDummyDetailSection.addin`
 
-Một bảng giao diện (Palette) sẽ xuất hiện bên cạnh màn hình làm việc của bạn.
+---
 
-3. CÁC TÍNH NĂNG CHÍNH
-   🔍 Tra cứu tức thì (One-Click Inspect)
-   Chỉ cần click chuột trái vào bất kỳ một chi tiết (Part), bề mặt (Face), hoặc cạnh (Edge) nào trên mô hình 3D, toàn bộ thông tin iProperties, Vật liệu, Khối lượng và Dữ liệu BOM (Item No, Số lượng) sẽ tự động hiện ra ngay lập tức trên bảng Data Center.
+## Deployment Layout
 
-✍️ Sửa dữ liệu siêu tốc (Pop-up Edit)
-Bạn không cần phải mở bảng iProperties thủ công như trước nữa!
+The `.bat` script expects subfolder layout per addin. Place the entire addin in its own `MCG_<AddinName>` subfolder under `C:\CustomTools\Inventor\`:
 
-Những ô thông tin có viền màu xanh dương (Part Number, Title, Description, Revision, Designer) là những ô cho phép sửa trực tiếp.
+```
+C:\CustomTools\Inventor\
+├── MCG_InventorCreateDummyDetailSection\        ← addin subfolder
+│   ├── MCG_InventorCreateDummyDetailSection.dll
+│   ├── MCG_InventorCreateDummyDetailSection.addin
+│   └── Symbol Sections.idw                       ← stays here, addin finds via fallback
+└── Install_AutoLoadInventorAddin.bat             ← run once
+```
 
-Cách sửa: Click đúp (Double-click) vào ô muốn sửa. Một hộp thoại nhỏ sẽ bật lên. Gõ thông tin mới (Hỗ trợ gõ cả Tiếng Anh và Tiếng Việt mượt mà) và nhấn phím Enter để lưu thẳng vào file.
+Run `Install_AutoLoadInventorAddin.bat` → copies `.dll + .addin` to `%APPDATA%\Autodesk\Inventor 2023\Addins\MCG_InventorCreateDummyDetailSection\`.
 
-☁️ Tích hợp Vault (Smart Vault Integration)
-Nút "Open File Location": Bấm để mở thư mục chứa file 3D hiện tại trên Windows.
+`Symbol Sections.idw` is **not** copied by the .bat — the addin reads it from the source location (`C:\CustomTools\Inventor\MCG_InventorCreateDummyDetailSection\`) when needed.
 
-Nút "Get Vault Drawing": Bấm để Add-in tự động quét trên hệ thống Vault, tải về và mở ngay lập tức bản vẽ kỹ thuật 2D (.idw / .dwg) của chi tiết bạn đang chọn mà không cần thao tác tìm kiếm thủ công.
+---
 
-Chúc bạn có những giờ làm việc năng suất với công cụ mới này!
+## Ribbon Integration
+
+Uses the `MCG.Inventor.Ribbon` SDK (Core folder). Tool appears at:
+
+```
+Drawing ribbon
+└── MCG TOOLS tab               (shared with other MCG addins)
+    └── Drawing panel
+        └── [Dummy Tools]       click → toggle palette dock
+```
+
+The MCG TOOLS tab is created by whichever MCG addin loads first; subsequent addins reuse it.
+
+---
+
+## Symbol Library
+
+Task 3 (Dummy Section) requires 4 SketchedSymbol definitions:
+`SECTION_L-R`, `SECTION_R-L`, `SECTION_U-D`, `SECTION_D-U`
+
+If missing in the active drawing, the addin opens `Symbol Sections.idw` (visible) and prompts the user to copy symbols via Inventor UI (right-click → Copy/Paste in Browser → Sketched Symbols).
+
+Manual copy is required because the Inventor API's `CopyContentsTo` does not transfer solid hatch fill on arrow heads.
+
+---
+
+## Add-in Architecture
+
+- **Entry point**: `StandardAddInServer.cs` uses JIT-safe pattern (`Activate` → `ActivateInternal` with `[MethodImpl(NoInlining)]`) so dependency-loading exceptions don't propagate to Inventor and break Vault/Content Center.
+- **Logger**: `C:\CustomTools\Inventor\logs\MCG_InventorCreateDummyDetailSection.log` — auto-deleted on successful load. Presence indicates an error.
+- **GUID**: `{9D0B4403-518D-40C6-98AC-CD2FF878B309}` — must be unique across all MCG addins on a machine.
+
+---
+
+## Documentation
+
+- **End users**: open `Instructions.html` for installation + usage guide.
+- **Developers**: see `Core/MCGRibbonReadme.md` for the portable ribbon SDK conventions.

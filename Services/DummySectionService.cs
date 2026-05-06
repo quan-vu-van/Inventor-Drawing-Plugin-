@@ -48,20 +48,50 @@ namespace InventorDrawingPlugin.Services
             _endPt = null;
             _hasPreview = false;
 
+            // Neu chua co view duoc chon truoc → hien thong bao truoc khi vao interaction mode
+            if (_targetView == null)
+            {
+                System.Windows.MessageBox.Show(
+                    "Please select a VIEW on the drawing first.\n\n" +
+                    "Tip: For faster workflow, select a view BEFORE clicking 'Create Dummy Section'.\n\n" +
+                    "After clicking OK, click on the desired view to start.",
+                    "View Required",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
+            }
+
             try
             {
                 _ie = _inventorApp.CommandManager.CreateInteractionEvents();
                 _ie.InteractionDisabled = false;
+
                 _me = _ie.MouseEvents;
                 _me.MouseMoveEnabled = true;
                 _me.PointInferenceEnabled = true;
                 _me.OnMouseClick += OnMouseClick;
                 _me.OnMouseMove += OnMouseMove;
+
                 _ie.OnTerminate += OnTerminate;
-                _inventorApp.StatusBarText = _targetView != null
-                    ? $"SECTION ({_targetView.Name}): Click START point of section line"
-                    : "SECTION: Click on the VIEW to create section";
+
+                if (_targetView == null)
+                {
+                    _inventorApp.StatusBarText =
+                        ">>> Click on a VIEW to create section on (Right-click or Esc to cancel) <<<";
+                }
+                else
+                {
+                    _inventorApp.StatusBarText = $"SECTION ({_targetView.Name}): Click START point of section line";
+                }
+
                 _ie.Start();
+
+                // Set cursor: select-view mode khi cho user pick view, neu khong thi mac dinh
+                try
+                {
+                    if (_targetView == null)
+                        _ie.SetCursor(CursorTypeEnum.kCursorBuiltInSelectView, null, null);
+                }
+                catch { }
             }
             catch (Exception ex)
             {
@@ -93,7 +123,9 @@ namespace InventorDrawingPlugin.Services
                     _targetView = FindViewAtPoint(_sheet, pt);
                     if (_targetView == null) return;
                     _step = PickStep.Start;
-                    _inventorApp.StatusBarText = $"SECTION ({_targetView.Name}): Click START point";
+                    // Doi cursor sang crosshair cho point picking
+                    try { _ie.SetCursor(CursorTypeEnum.kCursorBuiltInCrosshair, null, null); } catch { }
+                    _inventorApp.StatusBarText = $"SECTION ({_targetView.Name}): Click START point of section line";
                     break;
 
                 case PickStep.Start:
@@ -422,23 +454,46 @@ namespace InventorDrawingPlugin.Services
         {
             string[] required = { SYM_LR, SYM_RL, SYM_UD, SYM_DU };
 
-            // Neu du ca 4 -> khong can import
+            // Iterate collection va so sanh ten — robust hon indexer access
+            // (indexer co the throw du symbol exists trong vai truong hop COM)
+            var existingNames = new System.Collections.Generic.HashSet<string>(
+                System.StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                foreach (SketchedSymbolDefinition def in _dwgDoc.SketchedSymbolDefinitions)
+                {
+                    try { existingNames.Add(def.Name); } catch { }
+                }
+            }
+            catch { }
+
             bool allExist = true;
             foreach (var name in required)
             {
-                try { var _ = _dwgDoc.SketchedSymbolDefinitions[name]; }
-                catch { allExist = false; break; }
+                if (!existingNames.Contains(name)) { allExist = false; break; }
             }
             if (allExist) return;
 
-            // Tim file Symbol Sections.idw cung thu muc voi .dll
+            // Tim Symbol Sections.idw o nhieu vi tri:
+            // 1. Cung folder voi DLL (sau khi .bat deploy: %APPDATA%\...\Addins\<sub>\)
+            // 2. Source folder (.bat khong copy .idw, can fallback ve source)
             string dllDir = System.IO.Path.GetDirectoryName(
                 System.Reflection.Assembly.GetExecutingAssembly().Location);
-            string libFile = System.IO.Path.Combine(dllDir, "Symbol Sections.idw");
-
-            if (!System.IO.File.Exists(libFile))
+            string[] candidates =
             {
-                _inventorApp.StatusBarText = $"Library not found: {libFile}";
+                System.IO.Path.Combine(dllDir, "Symbol Sections.idw"),
+                @"C:\CustomTools\Inventor\MCG_InventorCreateDummyDetailSection\Symbol Sections.idw"
+            };
+
+            string libFile = null;
+            foreach (var path in candidates)
+            {
+                if (System.IO.File.Exists(path)) { libFile = path; break; }
+            }
+
+            if (libFile == null)
+            {
+                _inventorApp.StatusBarText = "Symbol Sections.idw not found in DLL folder or C:\\CustomTools\\Inventor\\MCG_InventorCreateDummyDetailSection\\";
                 return;
             }
 

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- File copied automatically to: %APPDATA%\Autodesk\Inventor 2023\Addins\ -->
+<!-- Deployed by Install_AutoLoadInventorAddin.bat to:
+     %APPDATA%\Autodesk\Inventor 2023\Addins\MCG_InventorCreateDummyDetailSection\ -->
 <Addin Type="Standard">
   <ClassId>{9D0B4403-518D-40C6-98AC-CD2FF878B309}</ClassId>
   <ClientId>{9D0B4403-518D-40C6-98AC-CD2FF878B309}</ClientId>
 
   <DisplayName>MCG_InventorCreateDummyDetailSection</DisplayName>
   <Description>Create dummy section markers and detail boundaries on Inventor drawings without generating real Section/Detail views</Description>
-  <Assembly>C:\CustomTools\Inventor\MCG_InventorCreateDummyDetailSection.dll</Assembly>
+  <Assembly>MCG_InventorCreateDummyDetailSection.dll</Assembly>
 
   <!-- Inventor 2023 = version 27.x, support from version 26 onwards -->
   <SoftwareVersionGreaterThan>26</SoftwareVersionGreaterThan>

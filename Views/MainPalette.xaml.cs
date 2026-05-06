@@ -1,7 +1,6 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using Microsoft.Win32;
 using Inventor;
 
 namespace InventorDrawingPlugin.Views
@@ -16,44 +15,14 @@ namespace InventorDrawingPlugin.Views
             _inventorApp = app;
         }
 
-        // --- TASK 1: SMART REPLACE ---
+        // --- TASK 1: SMART REPLACE (Shelved due to Inventor API limits) ---
         private void BtnSmartReplace_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                if (_inventorApp.ActiveDocument is DrawingDocument dwgDoc)
-                {
-                    OpenFileDialog openFileDialog = new OpenFileDialog
-                    {
-                        Title = "Select New Model (Model B) to Replace",
-                        Filter = "Inventor Assembly (*.iam)|*.iam|Inventor Part (*.ipt)|*.ipt|All Files (*.*)|*.*"
-                    };
-
-                    if (openFileDialog.ShowDialog() == true)
-                    {
-                        LogMessage($"[Task 1] Bat dau Smart Replace voi file:\n{openFileDialog.FileName}");
-
-                        // Khoi tao Service voi logger truyen thang vao UI
-                        var replaceService = new Services.SmartReplaceService(_inventorApp, msg => LogMessage(msg));
-                        replaceService.ExecuteSmartReplace(dwgDoc, openFileDialog.FileName);
-
-                        LogMessage($"[Task 1] Hoan tat!");
-                        LogMessage($"  Dim:      XANH={replaceService.CountGreen} | DO={replaceService.CountRed} | MAT={replaceService.CountLost}");
-                        LogMessage($"  Note:     XANH={replaceService.CountNoteGreen} | MAT={replaceService.CountNoteLost}");
-                        LogMessage($"  HoleNote: XANH={replaceService.CountHoleNoteGreen} | DO={replaceService.CountHoleNoteRed} | MAT={replaceService.CountHoleNoteLost}");
-                        LogMessage($"  Sketch:   RESTORED={replaceService.CountSketchRestored} | LOST={replaceService.CountSketchLost}");
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Vui lòng mở một bản vẽ (.idw hoặc .dwg) để sử dụng tính năng này.", 
-                                    "Cảnh báo", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-            }
-            catch (Exception ex)
-            {
-                LogMessage($"[Lỗi Task 1]: {ex.Message}");
-            }
+            MessageBox.Show(
+                "Task 1 is PENDING.\n\n" +
+                "Smart Replace Model has been shelved due to Inventor API limitations " +
+                "(proxy system breaks dimensions/annotations on model replace).",
+                "Task 1 - Pending", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         // --- TASK 2: SMART ROTATE VIEW (Shelved due to Inventor API limits) ---
